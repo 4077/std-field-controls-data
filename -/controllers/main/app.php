@@ -20,5 +20,9 @@ class App extends \Controller
     public function writeData()
     {
         $this->cell->value(j_($this->data('data')));
+
+        pusher()->trigger('std/cell/update', [
+            'cell' => $this->cell->xpack()
+        ]);
     }
 }

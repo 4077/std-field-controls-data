@@ -2,16 +2,16 @@
 
 class Main extends \Controller
 {
-    private $model;
-
-    private $field;
+    /**
+     * @var \ewma\Data\Cell
+     */
+    private $cell;
 
     public function __create()
     {
-        $model = $this->model = $this->data['model'];
-        $field = $this->field = $this->data['field'];
+        $this->cell = $this->unpackCell();
 
-        $this->instance_(underscore_cell($model, $field));
+        $this->instance_($this->cell->xpack());
     }
 
     public function reload()
@@ -23,19 +23,20 @@ class Main extends \Controller
     {
         $v = $this->v('|');
 
-        $model = $this->model;
-        $field = $this->field;
+        $cell = $this->cell;
 
         $v->assign([
                        'CONTENT' => $this->c('\std\ui\data~:view|' . $this->_nodeInstance(), [
-                           'read_call'  => $this->_abs('>app:readData', ['cell' => xpack_cell($model, $field)]),
-                           'write_call' => $this->_abs('>app:writeData', ['cell' => xpack_cell($model, $field)])
+                           'read_call'  => $this->_abs('>app:readData', ['cell' => $cell->xpack()]),
+                           'write_call' => $this->_abs('>app:writeData', ['cell' => $cell->xpack()])
                        ])
                    ]);
 
         $this->css(':\js\jquery\ui icons');
 
-        $this->e(underscore_field($model, $field))->rebind(':reload');
+        if (!$this->app->html->containerAdded($this->_nodeId())) {
+            $this->app->html->addContainer($this->_nodeId(), $this->c('eventsDispatcher:view'));
+        }
 
         return $v;
     }
